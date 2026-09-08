@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>
+        Solver de Ecuaciones Diferenciales
+    </title>
+
+    <!-- Bootstrap -->
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <!-- CSS propio -->
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- =================================== -->
+    <!-- Sidebar -->
+    <!-- =================================== -->
+
+    <aside id="sidebar" aria-label="Navegación principal">
+        <div class="brand">
+            <h1>Solver de Ecuaciones</h1>
+            <p>Herramientas para ecuaciones diferenciales</p>
+        </div>
+
+        <div class="nav-section">Solvers</div>
+        <button id="menuLineal" class="nav-item-custom active" type="button">Ecuación lineal</button>
+        <button id="menuExacta" class="nav-item-custom" type="button">Ecuación exacta</button>
+        <button id="menuNoExacta" class="nav-item-custom" type="button">Ecuación no exacta</button>
+        <button id="menuCarbono" class="nav-item-custom" type="button">Carbono-14</button>
+        <button id="menuSeparable" class="nav-item-custom" type="button">Variables separables</button>
+
+        <div class="nav-section">Ejercicios</div>
+        <button class="btn-ej ejercicio mx-3 mb-2" type="button" data-id="1"><span class="num">1</span>Ejercicio lineal</button>
+        <button class="btn-ej ejercicio mx-3 mb-2" type="button" data-id="2"><span class="num">2</span>Ejercicio exacto</button>
+        <button class="btn-ej ejercicio mx-3 mb-2" type="button" data-id="3"><span class="num">3</span>Ejercicio no exacto</button>
+        <button class="btn-ej ejercicio mx-3 mb-2" type="button" data-id="4"><span class="num">4</span>Ejercicio Carbono-14</button>
+    </aside>
+
+    <button id="toggle-sidebar" type="button" aria-label="Abrir navegación">☰</button>
+
+
+    <!-- =================================== -->
+    <!-- Contenido Principal -->
+    <!-- =================================== -->
+
+    <main id="main">
+        <header id="topbar">
+            <h2>Resolución paso a paso</h2>
+            <span class="badge-type">SYMPY</span>
+        </header>
+
+        <section id="content">
+            <div id="inicio" class="vista solver-card">
+                <h3 class="card-title-custom">Selecciona un método</h3>
+                <p class="text-muted">Usa el menú lateral para introducir una ecuación o cargar un ejercicio.</p>
+            </div>
+
+            <div id="vistaLineal" class="vista solver-card">
+                <h3 class="card-title-custom">Ecuación diferencial lineal</h3>
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label-custom" for="P">P(x)</label><input id="P" class="form-control form-control-dark" placeholder="Ej. 2/x" required></div>
+                        <div class="col-md-6"><label class="form-label-custom" for="Q">Q(x)</label><input id="Q" class="form-control form-control-dark" placeholder="Ej. x^2" required></div>
+                        <div class="col-md-4"><label class="form-label-custom" for="variable">Variable</label><input id="variable" class="form-control form-control-dark" value="x"></div>
+                        <div class="col-md-4"><label class="form-label-custom" for="x0">x₀ (opcional)</label><input id="x0" class="form-control form-control-dark" type="number" step="any"></div>
+                        <div class="col-md-4"><label class="form-label-custom" for="y0">y₀ (opcional)</label><input id="y0" class="form-control form-control-dark" type="number" step="any"></div>
+                    </div>
+                    <div class="mt-4"><button id="btnResolverLineal" class="btn-solve" type="button">Resolver</button><button class="btn-clear ms-2" type="button" onclick="limpiarTodo()">Limpiar</button></div>
+                </form>
+            </div>
+
+            <div id="vistaExacta" class="vista solver-card purple">
+                <h3 class="card-title-custom">Ecuación exacta</h3>
+                <form><div class="row g-3"><div class="col-md-6"><label class="form-label-custom" for="MExacta">M(x,y)</label><input id="MExacta" class="form-control form-control-dark" placeholder="Ej. 2xy + 1" required></div><div class="col-md-6"><label class="form-label-custom" for="NExacta">N(x,y)</label><input id="NExacta" class="form-control form-control-dark" placeholder="Ej. x^2 + y" required></div></div><div class="mt-4"><button id="btnResolverExacta" class="btn-solve" type="button">Resolver</button></div></form>
+            </div>
+
+            <div id="vistaNoExacta" class="vista solver-card orange">
+                <h3 class="card-title-custom">Ecuación no exacta</h3>
+                <form><div class="row g-3"><div class="col-md-6"><label class="form-label-custom" for="MNoExacta">M(x,y)</label><input id="MNoExacta" class="form-control form-control-dark" placeholder="Ej. y" required></div><div class="col-md-6"><label class="form-label-custom" for="NNoExacta">N(x,y)</label><input id="NNoExacta" class="form-control form-control-dark" placeholder="Ej. x" required></div></div><div class="mt-4"><button id="btnResolverNoExacta" class="btn-solve" type="button">Resolver</button></div></form>
+            </div>
+
+            <div id="vistaCarbono" class="vista solver-card green">
+                <h3 class="card-title-custom">Datación por Carbono-14</h3>
+                <form><div class="row g-3"><div class="col-md-4"><label class="form-label-custom" for="vida_media">Vida media</label><input id="vida_media" class="form-control form-control-dark" type="number" min="0" step="any" required></div><div class="col-md-4"><label class="form-label-custom" for="cantidad_inicial">Cantidad inicial</label><input id="cantidad_inicial" class="form-control form-control-dark" type="number" min="0" step="any" required></div><div class="col-md-4"><label class="form-label-custom" for="cantidad_final">Cantidad final</label><input id="cantidad_final" class="form-control form-control-dark" type="number" min="0" step="any" required></div></div><div class="mt-4"><button id="btnResolverCarbono" class="btn-solve" type="button">Resolver</button></div></form>
+            </div>
+
+            <div id="vistaSeparable" class="vista solver-card orange">
+                <h3 class="card-title-custom">Ecuacion de variables separables</h3>
+                <p class="text-muted small">Forma: dy/dx = f(x) · g(y)</p>
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label-custom" for="fSeparable">f(x)</label><input id="fSeparable" class="form-control form-control-dark" placeholder="Ej. x" required></div>
+                        <div class="col-md-6"><label class="form-label-custom" for="gSeparable">g(y)</label><input id="gSeparable" class="form-control form-control-dark" placeholder="Ej. y" required></div>
+                        <div class="col-md-6"><label class="form-label-custom" for="x0Separable">x₀ (opcional)</label><input id="x0Separable" class="form-control form-control-dark" type="number" step="any"></div>
+                        <div class="col-md-6"><label class="form-label-custom" for="y0Separable">y₀ (opcional)</label><input id="y0Separable" class="form-control form-control-dark" type="number" step="any"></div>
+                    </div>
+                    <div class="mt-4"><button id="btnResolverSeparable" class="btn-solve" type="button">Resolver</button><button class="btn-clear ms-2" type="button" onclick="limpiarTodo()">Limpiar</button></div>
+                </form>
+            </div>
+
+            <section id="resultado-box" aria-live="polite"><div id="resultado"></div></section>
+        </section>
+    </main>
+
+    
+
+
+    <!-- =================================== -->
+    <!-- Bootstrap -->
+    <!-- =================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- MathJax -->
+
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+    <!-- JavaScript -->
+
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/views.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+
+</html>
